@@ -1,6 +1,8 @@
 //SPDX-License-Identifier:MIT
 pragma solidity ^0.8.9;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
 contract NFTMarketplace {
     /// @notice The Object which contains a listing
     struct Listing {
@@ -9,7 +11,7 @@ contract NFTMarketplace {
     }
 
     /// @dev Contract Address => (TokenID => Listing Data)
-    mapping(address => mapping(uint256 => Listing)) public listing;
+    mapping(address => mapping(uint256 => Listing)) public listings;
 
     /// @notice Event triggered when a listing is created
     event ListingCreated(
@@ -86,7 +88,7 @@ contract NFTMarketplace {
             seller: msg.sender
         });
 
-        emit ListingCreated(nftAddress, tokenId, msg.sender);
+        emit ListingCreated(nftAddress, tokenId, price, msg.sender);
     }
 
     /// @notice Cancel and Already listed event

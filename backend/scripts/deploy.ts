@@ -1,34 +1,37 @@
 import { ethers } from "hardhat";
-import hre from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  // Load the NFT contract artifacts
+  const CeloNFTFactory = await ethers.getContractFactory("CeloNFT");
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  // Deploy the contract
+  const celoNftContract = await CeloNFTFactory.deploy();
+  await celoNftContract.deployed();
 
-  //* Deployement Process
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  // Print the address of the NFT contract
+  console.log("Celo NFT deployed to:", celoNftContract.address);
 
-  await lock.deployed();
+  // Load the marketplace contract artifacts
+  const NFTMarketplaceFactory = await ethers.getContractFactory(
+    "NFTMarketplace"
+  );
 
-  console.log("Lock with 1 ETH deployed to:", lock.address);
+  // Deploy the contract
+  const nftMarketplaceContract = await NFTMarketplaceFactory.deploy();
 
-  //* Verfication Process
-  console.log("Sleeping...");
-  await sleep(50000);
+  // Wait for deployment to finish
+  await nftMarketplaceContract.deployed();
 
-  await hre.run("verify:verify", {
-    address: lock.address,
-    constructorArguments: [unlockTime],
-  });
+  // Log the address of the new contract
+  console.log("NFT Marketplace deployed to:", nftMarketplaceContract.address);
 }
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+//Celo NFT deployed to: 0x89A57A47D6CE051076C914EEBBA8607e8E3aCc3A
+//NFT Marketplace deployed to: 0x627f152f97d431B844604B4421313CA979712006
 
 main().catch((error) => {
   console.error(error);
