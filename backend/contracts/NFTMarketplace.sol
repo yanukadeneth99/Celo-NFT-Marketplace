@@ -120,6 +120,7 @@ contract NFTMarketplace {
     {
         Listing memory listing = listings[nftAddress][tokenId];
         require(msg.value == listing.price, "MRKT: Incorrect Eth Supplied!");
+		delete listings[nftAddress][tokenId];
         IERC721(nftAddress).safeTransferFrom(
             listing.seller,
             msg.sender,
@@ -127,7 +128,6 @@ contract NFTMarketplace {
         );
         (bool sent, ) = payable(listing.seller).call{value: msg.value}("");
         require(sent, "Failed to transfer eth");
-        delete listings[nftAddress][tokenId];
         emit ListingPurchased(nftAddress, tokenId, listing.seller, msg.sender);
     }
 }
